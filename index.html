@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin Market Engine – FMCG Launch Simulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 200px);
+        }
+
+        .sidebar {
+            width: 320px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 2px solid #e0e0e0;
+        }
+
+        .sidebar h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.4em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .input-group input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .input-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .input-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            text-align: right;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .run-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .run-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .run-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .dashboard {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .chart-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+
+        .insights-section {
+            background: #fff3cd;
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #ffc107;
+            margin-bottom: 30px;
+        }
+
+        .insights-section h3 {
+            color: #856404;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .insight-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid #ffc107;
+        }
+
+        .insight-label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .insight-value {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .risk-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .risk-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .risk-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .objections-section {
+            background: #f8d7da;
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #dc3545;
+        }
+
+        .objections-section h3 {
+            color: #721c24;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .objection-item {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .objection-number {
+            background: #dc3545;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .placeholder {
+            text-align: center;
+            padding: 60px;
+            color: #999;
+            font-size: 1.2em;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid #e0e0e0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Digital Twin Market Engine</h1>
+            <p>FMCG Launch Simulator – Women's Protein Drink | India Market</p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h2>Product Configuration</h2>
+
+                <div class="input-group">
+                    <label>Price (INR)</label>
+                    <input type="range" id="priceSlider" min="299" max="599" value="449" step="10">
+                    <div class="value-display">₹<span id="priceValue">449</span></div>
+                </div>
+
+                <div class="input-group">
+                    <label>Sugar-Free Option</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn" id="sugarNoBtn">No</button>
+                        <button class="toggle-btn active" id="sugarYesBtn">Yes</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Packaging Type</label>
+                    <select id="packagingSelect">
+                        <option value="basic">Basic</option>
+                        <option value="premium">Premium</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Influencer Marketing Campaign</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn" id="influencerNoBtn">No</button>
+                        <button class="toggle-btn active" id="influencerYesBtn">Yes</button>
+                    </div>
+                </div>
+
+                <button class="run-btn" id="runSimulation">🚀 Run Simulation</button>
+            </div>
+
+            <div class="dashboard">
+                <div id="placeholder" class="placeholder">
+                    👆 Configure product parameters and click "Run Simulation" to see results
+                </div>
+
+                <div id="results" class="hidden">
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Overall Purchase Probability</div>
+                            <div class="metric-value"><span id="overallProb">0</span>%</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Estimated Monthly Revenue</div>
+                            <div class="metric-value">₹<span id="revenue">0</span></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Market Size</div>
+                            <div class="metric-value"><span id="marketSize">500</span></div>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <h3>📊 Segment-wise Purchase Probability</h3>
+                        <div class="chart-container">
+                            <canvas id="segmentChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <h3>📈 Price Elasticity Curve</h3>
+                        <div class="chart-container">
+                            <canvas id="elasticityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="insights-section">
+                        <h3>💡 Business Insights</h3>
+                        <div class="insight-item">
+                            <div class="insight-label">Most Responsive Segment</div>
+                            <div class="insight-value" id="responsiveSegment">-</div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-label">Most Price Sensitive Segment</div>
+                            <div class="insight-value" id="sensitiveSegment">-</div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-label">Launch Risk Level</div>
+                            <div class="insight-value">
+                                <span class="risk-badge" id="riskBadge">-</span>
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-label">Strategic Recommendation</div>
+                            <div class="insight-value" id="recommendation">-</div>
+                        </div>
+                    </div>
+
+                    <div class="objections-section">
+                        <h3>⚠️ Top 3 Customer Objections</h3>
+                        <div class="objection-item">
+                            <div class="objection-number">1</div>
+                            <div id="objection1">-</div>
+                        </div>
+                        <div class="objection-item">
+                            <div class="objection-number">2</div>
+                            <div id="objection2">-</div>
+                        </div>
+                        <div class="objection-item">
+                            <div class="objection-number">3</div>
+                            <div id="objection3">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let state = {
+            price: 449,
+            sugarFree: true,
+            packaging: 'basic',
+            influencer: true
+        };
+
+        let segmentChart = null;
+        let elasticityChart = null;
+
+        // 8 Base Persona Templates
+        const basePersonas = [
+            {
+                name: "Urban Health Enthusiast",
+                cityType: "Urban",
+                incomeLevel: "High",
+                healthConsciousness: 9,
+                priceSensitivity: 3,
+                brandLoyalty: 7,
+                weight: 15
+            },
+            {
+                name: "Working Professional",
+                cityType: "Urban",
+                incomeLevel: "Medium",
+                healthConsciousness: 7,
+                priceSensitivity: 6,
+                brandLoyalty: 5,
+                weight: 20
+            },
+            {
+                name: "Budget-Conscious Mother",
+                cityType: "Tier-2",
+                incomeLevel: "Medium",
+                healthConsciousness: 6,
+                priceSensitivity: 8,
+                brandLoyalty: 4,
+                weight: 18
+            },
+            {
+                name: "Fitness-Focused Millennial",
+                cityType: "Urban",
+                incomeLevel: "High",
+                healthConsciousness: 10,
+                priceSensitivity: 2,
+                brandLoyalty: 6,
+                weight: 12
+            },
+            {
+                name: "Traditional Homemaker",
+                cityType: "Tier-2",
+                incomeLevel: "Low",
+                healthConsciousness: 5,
+                priceSensitivity: 9,
+                brandLoyalty: 8,
+                weight: 15
+            },
+            {
+                name: "Young Student",
+                cityType: "Urban",
+                incomeLevel: "Low",
+                healthConsciousness: 4,
+                priceSensitivity: 10,
+                brandLoyalty: 3,
+                weight: 10
+            },
+            {
+                name: "Senior Citizen",
+                cityType: "Tier-2",
+                incomeLevel: "Medium",
+                healthConsciousness: 8,
+                priceSensitivity: 7,
+                brandLoyalty: 9,
+                weight: 6
+            },
+            {
+                name: "Corporate Executive",
+                cityType: "Urban",
+                incomeLevel: "High",
+                healthConsciousness: 7,
+                priceSensitivity: 4,
+                brandLoyalty: 6,
+                weight: 4
+            }
+        ];
+
+        // Generate 500 personas from base templates
+        function generatePersonas() {
+            const personas = [];
+            const personasPerTemplate = Math.floor(500 / basePersonas.length);
+            
+            basePersonas.forEach((template, index) => {
+                const count = index === basePersonas.length - 1 
+                    ? 500 - personas.length  // Last template fills remaining
+                    : personasPerTemplate;
+                
+                for (let i = 0; i < count; i++) {
+                    personas.push({
+                        ...template,
+                        id: personas.length + 1,
+                        // Add small variations to create diversity
+                        age: 18 + Math.floor(Math.random() * 47), // 18-65
+                        healthConsciousness: Math.max(1, Math.min(10, template.healthConsciousness + (Math.random() - 0.5) * 2)),
+                        priceSensitivity: Math.max(1, Math.min(10, template.priceSensitivity + (Math.random() - 0.5) * 2)),
+                        brandLoyalty: Math.max(1, Math.min(10, template.brandLoyalty + (Math.random() - 0.5) * 2))
+                    });
+                }
+            });
+            
+            return personas;
+        }
+
+        const personas = generatePersonas();
+
+        // Calculate purchase probability for a persona
+        function calculatePurchaseProbability(persona, config) {
+            let probability = 50; // Base probability
+
+            // Price impact (inversely proportional to price sensitivity)
+            const priceScore = (1 - ((config.price - 299) / 300)) * 10;
+            const priceImpact = (10 - persona.priceSensitivity) * priceScore * 0.3;
+            probability += priceImpact;
+
+            // Sugar-free benefit (proportional to health consciousness)
+            if (config.sugarFree) {
+                const sugarFreeImpact = persona.healthConsciousness * 1.5;
+                probability += sugarFreeImpact;
+            } else {
+                const sugarPenalty = persona.healthConsciousness * -0.8;
+                probability += sugarPenalty;
+            }
+
+            // Premium packaging impact (proportional to brand loyalty and income)
+            if (config.packaging === 'premium') {
+                const packagingImpact = persona.brandLoyalty * 0.8;
+                probability += packagingImpact;
+                
+                // High income appreciates premium
+                if (persona.incomeLevel === 'High') {
+                    probability += 5;
+                }
+            }
+
+            // Influencer marketing impact
+            if (config.influencer) {
+                const influencerImpact = (11 - persona.brandLoyalty) * 0.7; // Less loyal = more influenced
+                probability += influencerImpact;
+                
+                // Urban and younger demographics more receptive
+                if (persona.cityType === 'Urban' && persona.age < 35) {
+                    probability += 8;
+                }
+            }
+
+            // Income level adjustments
+            if (persona.incomeLevel === 'Low' && config.price > 399) {
+                probability -= 15;
+            } else if (persona.incomeLevel === 'High') {
+                probability += 5;
+            }
+
+            // Normalize between 0-100
+            return Math.max(0, Math.min(100, probability));
+        }
+
+        // Run simulation
+        function runSimulation() {
+            const results = personas.map(persona => ({
+                persona,
+                probability: calculatePurchaseProbability(persona, state)
+            }));
+
+            // Calculate overall probability (weighted average)
+            const overallProb = results.reduce((sum, r, idx) => {
+                return sum + r.probability * (1 / personas.length);
+            }, 0);
+
+            // Segment-wise analysis
+            const segments = {};
+            basePersonas.forEach(bp => {
+                segments[bp.name] = {
+                    totalProb: 0,
+                    count: 0,
+                    weight: bp.weight,
+                    priceSensitivity: bp.priceSensitivity
+                };
+            });
+
+            results.forEach(r => {
+                if (segments[r.persona.name]) {
+                    segments[r.persona.name].totalProb += r.probability;
+                    segments[r.persona.name].count++;
+                }
+            });
+
+            const segmentResults = Object.keys(segments).map(name => ({
+                name,
+                avgProb: segments[name].totalProb / segments[name].count,
+                weight: segments[name].weight,
+                priceSensitivity: segments[name].priceSensitivity
+            })).sort((a, b) => b.avgProb - a.avgProb);
+
+            // Revenue calculation (monthly estimate)
+            // Assuming market size = 500 personas represent 50,000 potential customers
+            const marketMultiplier = 100;
+            const monthlyRevenue = results.reduce((sum, r) => {
+                return sum + (r.probability / 100) * state.price * marketMultiplier * (r.persona.weight / 100);
+            }, 0);
+
+            // Price elasticity data
+            const elasticityData = [];
+            for (let price = 299; price <= 599; price += 50) {
+                const avgProb = personas.reduce((sum, persona) => {
+                    return sum + calculatePurchaseProbability(persona, { ...state, price }) / personas.length;
+                }, 0);
+                elasticityData.push({ price, probability: avgProb });
+            }
+
+            // Business insights
+            const insights = generateInsights(overallProb, segmentResults, state);
+            
+            // Top objections
+            const objections = generateObjections(segmentResults, state, overallProb);
+
+            // Update UI
+            updateDashboard(overallProb, monthlyRevenue, segmentResults, elasticityData, insights, objections);
+        }
+
+        // Generate business insights
+        function generateInsights(overallProb, segments, config) {
+            const mostResponsive = segments[0];
+            const mostSensitive = segments.sort((a, b) => b.priceSensitivity - a.priceSensitivity)[0];
+            
+            let riskLevel = 'Low';
+            let riskClass = 'risk-low';
+            if (overallProb < 40) {
+                riskLevel = 'High';
+                riskClass = 'risk-high';
+            } else if (overallProb < 60) {
+                riskLevel = 'Medium';
+                riskClass = 'risk-medium';
+            }
+
+            // Generate recommendation
+            let recommendation = '';
+            if (config.price > 500 && overallProb < 50) {
+                recommendation = 'Consider reducing price to ₹399-449 range to improve market acceptance.';
+            } else if (!config.sugarFree && overallProb < 55) {
+                recommendation = 'Sugar-free option is critical for health-conscious segments. Enable it for better response.';
+            } else if (config.packaging === 'basic' && mostResponsive.name.includes('Executive')) {
+                recommendation = 'Premium packaging could boost appeal to high-income segments.';
+            } else if (!config.influencer) {
+                recommendation = 'Influencer marketing can significantly boost awareness among urban millennials.';
+            } else {
+                recommendation = 'Current configuration shows strong market potential. Consider A/B testing pricing tiers.';
+            }
+
+            return {
+                mostResponsive: mostResponsive.name + ` (${mostResponsive.avgProb.toFixed(1)}% purchase probability)`,
+                mostSensitive: mostSensitive.name + ` (Price sensitivity: ${mostSensitive.priceSensitivity.toFixed(1)}/10)`,
+                riskLevel,
+                riskClass,
+                recommendation
+            };
+        }
+
+        // Generate top objections
+        function generateObjections(segments, config, overallProb) {
+            const objections = [];
+
+            // Objection 1: Price-related
+            if (config.price > 450) {
+                objections.push(`"Too expensive for daily use" - Affects ${segments.filter(s => s.priceSensitivity > 7).length} high price-sensitive segments`);
+            } else if (config.price < 350) {
+                objections.push(`"Low price raises quality concerns" - May affect premium segment perception`);
+            } else {
+                objections.push(`"Moderate pricing, but needs more value justification" - ₹${config.price} needs strong differentiation`);
+            }
+
+            // Objection 2: Product features
+            if (!config.sugarFree) {
+                objections.push(`"Contains sugar, not suitable for health goals" - Health-conscious segments (40% market) strongly prefer sugar-free`);
+            } else if (config.packaging === 'basic') {
+                objections.push(`"Basic packaging doesn't reflect premium positioning" - Premium packaging could boost appeal by 15%`);
+            } else {
+                objections.push(`"Need more proof of efficacy" - Requires testimonials and clinical validation for credibility`);
+            }
+
+            // Objection 3: Market competition
+            if (!config.influencer) {
+                objections.push(`"Never heard of this brand" - Lack of influencer marketing limits awareness, especially among urban millennials`);
+            } else if (overallProb < 50) {
+                objections.push(`"Why switch from current protein drink?" - Need stronger differentiation from established competitors`);
+            } else {
+                objections.push(`"Availability concerns" - Needs strong distribution strategy for Tier-2 cities (33% of target market)`);
+            }
+
+            return objections;
+        }
+
+        // Update dashboard UI
+        function updateDashboard(overallProb, revenue, segments, elasticityData, insights, objections) {
+            // Hide placeholder, show results
+            document.getElementById('placeholder').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+
+            // Update metrics
+            document.getElementById('overallProb').textContent = overallProb.toFixed(1);
+            document.getElementById('revenue').textContent = (revenue / 1000).toFixed(0) + 'K';
+            document.getElementById('marketSize').textContent = personas.length;
+
+            // Update insights
+            document.getElementById('responsiveSegment').textContent = insights.mostResponsive;
+            document.getElementById('sensitiveSegment').textContent = insights.mostSensitive;
+            document.getElementById('riskBadge').textContent = insights.riskLevel;
+            document.getElementById('riskBadge').className = 'risk-badge ' + insights.riskClass;
+            document.getElementById('recommendation').textContent = insights.recommendation;
+
+            // Update objections
+            document.getElementById('objection1').textContent = objections[0];
+            document.getElementById('objection2').textContent = objections[1];
+            document.getElementById('objection3').textContent = objections[2];
+
+            // Update charts
+            updateSegmentChart(segments);
+            updateElasticityChart(elasticityData);
+        }
+
+        // Update segment chart
+        function updateSegmentChart(segments) {
+            const ctx = document.getElementById('segmentChart').getContext('2d');
+            
+            if (segmentChart) {
+                segmentChart.destroy();
+            }
+
+            segmentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: segments.map(s => s.name),
+                    datasets: [{
+                        label: 'Purchase Probability (%)',
+                        data: segments.map(s => s.avgProb),
+                        backgroundColor: segments.map((s, i) => {
+                            const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#fee140', '#30cfd0'];
+                            return colors[i % colors.length];
+                        }),
+                        borderRadius: 8,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update elasticity chart
+        function updateElasticityChart(data) {
+            const ctx = document.getElementById('elasticityChart').getContext('2d');
+            
+            if (elasticityChart) {
+                elasticityChart.destroy();
+            }
+
+            elasticityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => '₹' + d.price),
+                    datasets: [{
+                        label: 'Purchase Probability (%)',
+                        data: data.map(d => d.probability),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listeners
+        document.getElementById('priceSlider').addEventListener('input', (e) => {
+            state.price = parseInt(e.target.value);
+            document.getElementById('priceValue').textContent = state.price;
+        });
+
+        // Sugar-free toggle
+        document.getElementById('sugarYesBtn').addEventListener('click', () => {
+            state.sugarFree = true;
+            document.getElementById('sugarYesBtn').classList.add('active');
+            document.getElementById('sugarNoBtn').classList.remove('active');
+        });
+
+        document.getElementById('sugarNoBtn').addEventListener('click', () => {
+            state.sugarFree = false;
+            document.getElementById('sugarNoBtn').classList.add('active');
+            document.getElementById('sugarYesBtn').classList.remove('active');
+        });
+
+        // Packaging select
+        document.getElementById('packagingSelect').addEventListener('change', (e) => {
+            state.packaging = e.target.value;
+        });
+
+        // Influencer toggle
+        document.getElementById('influencerYesBtn').addEventListener('click', () => {
+            state.influencer = true;
+            document.getElementById('influencerYesBtn').classList.add('active');
+            document.getElementById('influencerNoBtn').classList.remove('active');
+        });
+
+        document.getElementById('influencerNoBtn').addEventListener('click', () => {
+            state.influencer = false;
+            document.getElementById('influencerNoBtn').classList.add('active');
+            document.getElementById('influencerYesBtn').classList.remove('active');
+        });
+
+        // Run simulation button
+        document.getElementById('runSimulation').addEventListener('click', runSimulation);
+
+        // Initial state display
+        document.getElementById('priceValue').textContent = state.price;
+    </script>
+</body>
+</html>
