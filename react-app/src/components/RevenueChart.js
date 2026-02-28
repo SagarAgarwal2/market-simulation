@@ -15,7 +15,7 @@ function RevenueChart({ config, personas, mlEngine }) {
     const pricePoints = [];
     const revenues = [];
 
-    for (let price = 299; price <= 599; price += 25) {
+    for (let price = 99; price <= 999; price += 25) {
       const testConfig = { ...config, price };
       
       // Use batch prediction for better performance

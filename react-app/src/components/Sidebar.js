@@ -16,6 +16,14 @@ function Sidebar({ config, setConfig, onRunSimulation, mlReady, loading, modelSo
     setConfig({ ...config, influencer: value });
   };
 
+  const handleProductStageChange = (e) => {
+    setConfig({ ...config, productStage: e.target.value });
+  };
+
+  const handleBusinessModelToggle = (value) => {
+    setConfig({ ...config, businessModel: value });
+  };
+
   const statusText = () => {
     if (!mlReady) return modelSource === null ? '🔄 Training ML model from scratch...' : '🔄 Loading model...';
     if (modelSource === 'loaded') return '⚡ ML model loaded from cache — instant start!';
@@ -26,23 +34,47 @@ function Sidebar({ config, setConfig, onRunSimulation, mlReady, loading, modelSo
 
   return (
     <div className="sidebar">
-      <div className={statusClass}>
-        {statusText()}
-      </div>
-
       <h2>Product Configuration</h2>
 
       <div className="input-group">
         <label>Price (INR)</label>
         <input
           type="range"
-          min="299"
-          max="599"
+          min="99"
+          max="999"
           step="10"
           value={config.price}
           onChange={handlePriceChange}
         />
         <div className="value-display">₹{config.price}</div>
+      </div>
+
+      <div className="input-group">
+        <label>Product Stage</label>
+        <select className="config-select" value={config.productStage || 'ideation'} onChange={handleProductStageChange}>
+          <option value="ideation">💡 Ideation</option>
+          <option value="mvp">🔧 MVP Ready</option>
+          <option value="selling">🚀 Already Selling</option>
+        </select>
+        <div className="stage-badge-row">
+          {(!config.productStage || config.productStage === 'ideation') && <span className="stage-badge ideation">💡 Concept phase — validating demand</span>}
+          {config.productStage === 'mvp' && <span className="stage-badge mvp">🔧 MVP built — testing market fit</span>}
+          {config.productStage === 'selling' && <span className="stage-badge selling">🚀 Live — optimizing growth</span>}
+        </div>
+      </div>
+
+      <div className="input-group">
+        <label>Business Model</label>
+        <div className="toggle-group">
+          <button className={`toggle-btn ${(!config.businessModel || config.businessModel === 'B2C') ? 'active' : ''}`} onClick={() => handleBusinessModelToggle('B2C')}>B2C</button>
+          <button className={`toggle-btn ${config.businessModel === 'B2B' ? 'active' : ''}`} onClick={() => handleBusinessModelToggle('B2B')}>B2B</button>
+          <button className={`toggle-btn ${config.businessModel === 'B2B2C' ? 'active' : ''}`} onClick={() => handleBusinessModelToggle('B2B2C')}>B2B2C</button>
+        </div>
+        <div className="stage-badge-row">
+          {(!config.businessModel || config.businessModel === 'B2C') && <span className="stage-badge b2c">🛒 Selling direct to end consumers</span>}
+          {config.businessModel === 'B2B' && <span className="stage-badge b2b">🏢 Selling to businesses / retailers</span>}
+          {config.businessModel === 'B2B2C' && <span className="stage-badge b2b2c">🔗 Through business to reach consumers</span>}
+        </div>
       </div>
 
       <div className="input-group">

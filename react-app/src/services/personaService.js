@@ -100,7 +100,7 @@ export function generatePersonas() {
 export function calculateRuleBasedProbability(persona, config) {
   let probability = 50;
 
-  const priceScore = (1 - ((config.price - 299) / 300)) * 10;
+  const priceScore = (1 - ((config.price - 99) / 900)) * 10;
   const priceImpact = (10 - persona.priceSensitivity) * priceScore * 0.3;
   probability += priceImpact;
 
@@ -124,7 +124,7 @@ export function calculateRuleBasedProbability(persona, config) {
     }
   }
 
-  if (persona.incomeLevel === 'Low' && config.price > 399) {
+  if (persona.incomeLevel === 'Low' && config.price > 500) {
     probability -= 15;
   } else if (persona.incomeLevel === 'High') {
     probability += 5;

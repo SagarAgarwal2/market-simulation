@@ -62,7 +62,7 @@ class MLEngine {
 
   // Generate a single data sample with random features
   generateSample() {
-    const price = 299 + Math.random() * 300;
+    const price = 99 + Math.random() * 900;
     const healthConsciousness = 1 + Math.random() * 9;
     const priceSensitivity = 1 + Math.random() * 9;
     const brandLoyalty = 1 + Math.random() * 9;
@@ -502,9 +502,9 @@ class MLEngine {
       addressableRate *= 1.3;
     }
 
-    if (config.price < 400) {
+    if (config.price < 300) {
       addressableRate *= 1.5;
-    } else if (config.price > 500) {
+    } else if (config.price > 700) {
       addressableRate *= 0.7;
     }
 
@@ -521,10 +521,10 @@ class MLEngine {
 
   // Find optimal price (optimized for large datasets)
   findOptimalPrice(personas, config) {
-    let bestPrice = 299;
+    let bestPrice = 99;
     let bestRevenue = 0;
 
-    for (let price = 299; price <= 599; price += 25) {
+    for (let price = 99; price <= 999; price += 25) {
       const testConfig = { ...config, price };
       
       // Use batch prediction for all personas at once

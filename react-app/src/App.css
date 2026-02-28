@@ -427,6 +427,45 @@ select {
 }
 .retrain-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ── Product Stage & Business Model ──────────────────────────────── */
+.config-select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #2d3748;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: border-color 0.2s;
+  margin-top: 4px;
+}
+.config-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+}
+.stage-badge-row { margin-top: 8px; }
+.stage-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+.stage-badge.ideation  { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.stage-badge.mvp       { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.stage-badge.selling   { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.stage-badge.b2c       { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+.stage-badge.b2b       { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.stage-badge.b2b2c     { background: #e0f2fe; color: #075985; border: 1px solid #7dd3fc; }
+
 /* ── Groq LLM Insights Panel ─────────────────────────────────────── */
 .llm-panel {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);

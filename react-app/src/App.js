@@ -11,7 +11,9 @@ function App() {
     price: 449,
     sugarFree: true,
     packaging: 'basic',
-    influencer: true
+    influencer: true,
+    productStage: 'ideation',
+    businessModel: 'B2C'
   });
 
   const [mlEngine] = useState(() => new MLEngine());
