@@ -38,7 +38,7 @@ function Dashboard({ results, config, personas, loading, mlEngine, modelAccuracy
           <span className="accuracy-icon">
             {modelAccuracy.accuracy > 0.85 ? '✅' : modelAccuracy.accuracy > 0.75 ? '🟢' : '⚠️'}
           </span>
-          <strong>Model Accuracy: {(modelAccuracy.accuracy * 100).toFixed(1)}%</strong>
+          <strong>Confidence Score: {(modelAccuracy.accuracy * 100).toFixed(1)}%</strong>
           <span className="accuracy-detail">
             R²={modelAccuracy.r2Score.toFixed(2)} | MAE={modelAccuracy.mae.toFixed(3)} | Tested on {modelAccuracy.testSamples} samples
           </span>
